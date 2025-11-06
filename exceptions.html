@@ -545,5 +545,152 @@ ul li::before { content: '•'; position: absolute; left: 0; font-size: 1.2em; }
             </form>
         </div>
     </div>
+    <script>
+        function openShiftTab(evt, tabId) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.add('hidden'));
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            evt.currentTarget.classList.add('active');
+        }
+        function calculateTotals(formId, totalIdPrefix) {
+            const form = document.getElementById(formId);
+            if (!form) return;
+            const sumColumns = ['ods', 'tms', 'actual', 'miles', 'cube'];
+            const totals = {
+                'ods': 0,
+                'tms': 0,
+                'actual': 0,
+                'miles': 0,
+                'cube': 0
+            };
+            sumColumns.forEach(column => {
+                const inputs = form.querySelectorAll(`input[name*="-${column}"]`);
+                inputs.forEach(input => {
+                    const value = parseFloat(input.value) || 0;
+                    totals[column] += value;
+                });
+            });
+            sumColumns.forEach(column => {
+                const totalElement = document.getElementById(`${totalIdPrefix}-${column}`);
+                if (totalElement) {
+                    totalElement.textContent = totals[column].toLocaleString(undefined, { maximumFractionDigits: 0 });
+                }
+            });
+        }
+
+        function updateShipmentCard(totalIdPrefix) {
+            const tmsTotalId = `${totalIdPrefix}-tms`;
+            const tmsTotalElement = document.getElementById(tmsTotalId);
+            const shipmentCard = document.getElementById('card-metric-shipments');
+
+        if (tmsTotalElement && shipmentCard) {
+            shipmentCard.textContent = tmsTotalElement.textContent;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('am-tab-btn').classList.add('active');
+            document.getElementById('am-form').classList.remove('hidden');
+            const allInputs = document.querySelectorAll('.warehouse-metrics input[type="text"]');
+            allInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.closest('#am-update-form')) {
+                        calculateTotals('am-update-form', 'am-total');
+                        updateShipmentCard('am-total');
+                    } else if (input.closest('#pm-update-form')) {
+                        calculateTotals('pm-update-form', 'pm-total');
+                        updateShipmentCard('pm-total');
+                    }
+                });
+            });
+            calculateTotals('am-update-form', 'am-total');
+            updateShipmentCard('am-total');
+            calculateTotals('pm-update-form', 'pm-total');
+            updateShipmentCard('pm-total');
+        });
+        function openOverlayA() {
+            document.getElementById('overlay-container-a').classList.add('show-overlay-a');
+            }
+        function closeOverlayA() {
+            document.getElementById('overlay-container-a').classList.remove('show-overlay-a');
+            }
+        function openOverlayB() {
+            document.getElementById('overlay-container-b').classList.add('show-overlay-b');
+            }
+        function closeOverlayB() {
+            document.getElementById('overlay-container-b').classList.remove('show-overlay-b');
+            }
+        function openOverlayC() {
+            document.getElementById('overlay-container-c').classList.add('show-overlay-c');
+            }
+        function closeOverlayC() {
+            document.getElementById('overlay-container-c').classList.remove('show-overlay-c');
+            }
+
+        function addRowToTransfers() {
+            const tableBody = document.querySelector('.exception-detail-table-dlc tbody');
+            if (!tableBody) {
+                console.error("Exception table body not found.");
+                return;
+            }
+            const existingRow = tableBody.querySelector('tr:last-child');
+            if (!existingRow) {
+                console.error("Existing row not found for cloning.");
+                return;
+            }
+            const newRow = existingRow.cloneNode(true);
+            const newRowIndex = tableBody.children.length + 1;
+            const elementsToUpdate = newRow.querySelectorAll('select, input');
+            elementsToUpdate.forEach(element => {
+                let oldName = element.name;
+                if (oldName) {
+                    element.name = oldName.replace(/-\d+$/, `-${newRowIndex}`);
+                }
+                if (element.tagName === 'INPUT') {
+                    if (element.type === 'checkbox') {
+                        element.checked = false;
+                    } else {
+                        element.value = '';
+                    }
+                } else if (element.tagName === 'SELECT') {
+                    element.value = element.querySelector('option[disabled][selected]').value;
+                }
+            });
+            tableBody.appendChild(newRow);
+        }
+        function addRowToExceptionTable() {
+            const tableBody = document.querySelector('.exception-detail-table-trans tbody');
+            if (!tableBody) {
+                console.error("Exception table body not found.");
+                return;
+            }
+            const existingRow = tableBody.querySelector('tr:last-child');
+            if (!existingRow) {
+                console.error("Existing row not found for cloning.");
+                return;
+            }
+            const newRow = existingRow.cloneNode(true);
+            const newRowIndex = tableBody.children.length + 1;
+            const elementsToUpdate = newRow.querySelectorAll('select, input');
+            elementsToUpdate.forEach(element => {
+                let oldName = element.name;
+                if (oldName) {
+                    element.name = oldName.replace(/-\d+$/, `-${newRowIndex}`);
+                }
+                if (element.tagName === 'INPUT') {
+                    if (element.type === 'checkbox') {
+                        element.checked = false;
+                    } else {
+                        element.value = '';
+                    }
+                } else if (element.tagName === 'SELECT') {
+                    element.value = element.querySelector('option[disabled][selected]').value;
+                }
+            });
+            tableBody.appendChild(newRow);
+        }
+    </script>
     </body>
 </html>
